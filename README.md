@@ -31,6 +31,9 @@ python notebooks/gamma_sweep_multiseed.py      # gamma sensitivity, averaged ove
 
 ## Key result: risk aversion (gamma) sensitivity
 
+
+![Backtest results](notebooks/backtest_results.png)
+![Gamma sensitivity](notebooks/gamma_sensitivity_multiseed.png)
 Running the backtest across risk-aversion values (`gamma = 0.01, 0.1, 0.5, 1.0`),
 averaged over 20 random seeds per value, shows two effects:
 
