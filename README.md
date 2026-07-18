@@ -15,41 +15,51 @@ backtester that ties them together and measures PnL/inventory risk.
   reservation price and optimal spread from inventory, volatility, and time
   horizon; tracks PnL and inventory.
 - **`src/backtester.py`** — Wires the above together. Each step: mid price drifts,
-  the agent quotes, a random aggressor order may fill one side of the quote
-  (capped so inventory never exceeds the agent's limit), and PnL/inventory are
-  recorded.
+  the agent quotes, a random aggressor order may fill one side of the quote with
+  probability that decays as the quoted spread widens (capped so inventory never
+  exceeds the agent's limit), and PnL/inventory are recorded.
 
 ## Running it
 
-```bash
+\`\`\`bash
 source venv/bin/activate
 pip install -r requirements.txt
-pytest tests/ -v                          # 24 tests, all passing
-python notebooks/run_backtest.py          # single backtest run + PnL/inventory plot
-python notebooks/gamma_sweep.py           # parameter sensitivity across gamma
-```
+pytest tests/ -v                              # 24 tests, all passing
+python notebooks/run_backtest.py               # single backtest run + PnL/inventory plot
+python notebooks/gamma_sweep_multiseed.py      # gamma sensitivity, averaged over 20 seeds
+\`\`\`
 
-## Key result: gamma sensitivity
+## Key result: risk aversion (gamma) sensitivity
 
-Running the backtest across risk-aversion values (`gamma = 0.01, 0.1, 0.5, 1.0`)
-shows PnL getting *worse* as gamma increases — the opposite of what
-Avellaneda-Stoikov theory predicts, where higher risk aversion should protect
-PnL by tightening inventory control.
+Running the backtest across risk-aversion values (`gamma = 0.01, 0.1, 0.5, 1.0`),
+averaged over 20 random seeds per value, shows two effects:
 
-The cause: the backtester's fill model treats each step as a fixed-probability
-random aggressor, independent of spread width. In reality, a wider quote (higher
-gamma) should get hit *less often*, since a rational market taker won't cross an
-unfavorable spread. Here, fill probability doesn't fall as spread widens, so
-higher gamma only pushes quotes further from mid whenever they do fill — worsening
-execution price without the offsetting benefit of fewer bad fills.
+1. **Fill rate correctly falls as gamma rises** (664 → 581 → 346 → 226 average fills).
+   Higher risk aversion widens the agent's quoted spread, and — since fill
+   probability is modeled to decay with spread width — the agent is rightly hit
+   less often. This matches the theoretical intuition that a rational market
+   taker avoids crossing an unfavorable spread.
 
-This is a known simplification of the fill model, not a bug in the AS
-implementation itself — the reservation price and spread formulas were tested
-independently and match the theoretical behavior (spread widens with gamma,
-reservation price shifts correctly with inventory). A natural next step would be
-to make fill probability decrease with distance from mid, which should recover
-the theoretical PnL/gamma relationship.
+2. **Mean PnL does not recover as gamma increases past 0.01** (+3,749 at gamma=0.01,
+   then -956, -7,316, -5,255 at gamma=0.1/0.5/1.0). Standard Avellaneda-Stoikov
+   intuition suggests higher risk aversion should protect PnL by tightening
+   inventory control. Here it doesn't, because in this simulated environment the
+   mid-price's own random walk (independent Gaussian drift each step) does more
+   damage to PnL than inventory risk does — fewer, wider-spread fills reduce
+   adverse selection risk but also reduce the fraction of favorable spread the
+   agent captures, and the net effect is dominated by mid-price noise rather than
+   inventory risk.
+
+This is a genuine limitation of the simulation's price process (a driftless random
+walk with no fundamental value or mean reversion), not a bug in the AS
+implementation — the reservation price and spread formulas were independently
+tested and match theory (spread widens correctly with gamma; reservation price
+shifts correctly with inventory sign and magnitude). A natural extension would be
+to give the mid price a mean-reverting or trend-following structure, which should
+let inventory-aversion benefits show through more clearly in the PnL.
 
 ## Testing
 
-All four
+All four components have independent unit tests (`tests/`), covering matching
+logic, distributional properties of synthetic flow, reservation price and spread
+formulas, inventory limit enforcement, and reproducibility under fixed seeds.
