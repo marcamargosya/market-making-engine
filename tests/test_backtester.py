@@ -44,12 +44,12 @@ def test_backtester_mid_price_stays_positive():
 def test_backtester_reproducible_with_same_seed():
     mm1 = AvellanedaStoikovMaker()
     flow1 = OrderFlowGenerator(mid_price=100.0, seed=123)
-    bt1 = Backtester(mm1, flow1, n_steps=300, dt=0.002)
+    bt1 = Backtester(mm1, flow1, n_steps=300, dt=0.002, seed=5)
     results1 = bt1.run()
 
     mm2 = AvellanedaStoikovMaker()
     flow2 = OrderFlowGenerator(mid_price=100.0, seed=123)
-    bt2 = Backtester(mm2, flow2, n_steps=300, dt=0.002)
+    bt2 = Backtester(mm2, flow2, n_steps=300, dt=0.002, seed=5)
     results2 = bt2.run()
 
     assert results1["mid_price"] == results2["mid_price"]
