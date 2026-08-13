@@ -1,8 +1,3 @@
-"""
-Run the full backtest and plot results:
-PnL over time, inventory over time, and mid-price path.
-"""
-
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
