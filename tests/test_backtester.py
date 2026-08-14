@@ -53,12 +53,3 @@ def test_backtester_reproducible_with_same_seed():
     results2 = bt2.run()
 
     assert results1["mid_price"] == results2["mid_price"]
-
-
-if __name__ == "__main__":
-    test_backtester_runs_without_error()
-    test_backtester_produces_pnl_history()
-    test_backtester_inventory_stays_within_limit()
-    test_backtester_mid_price_stays_positive()
-    test_backtester_reproducible_with_same_seed()
-    print("All tests passed.")
