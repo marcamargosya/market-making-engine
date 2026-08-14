@@ -73,14 +73,3 @@ def test_mark_to_market_pnl():
     # bought 10 @ 100 (cash -1000), now worth 10*105=1050 -> pnl = 50
     assert abs(pnl - 50.0) < 1e-9
 
-
-if __name__ == "__main__":
-    test_reservation_price_at_zero_inventory()
-    test_reservation_price_shifts_with_long_inventory()
-    test_reservation_price_shifts_with_short_inventory()
-    test_spread_widens_near_horizon_end()
-    test_get_quotes_returns_valid_bid_ask()
-    test_inventory_limit_stops_quoting()
-    test_on_fill_updates_inventory_and_cash()
-    test_mark_to_market_pnl()
-    print("All tests passed.")
