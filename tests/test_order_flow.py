@@ -53,10 +53,3 @@ def test_feeds_into_order_book():
     assert isinstance(snap["asks"], list)
 
 
-if __name__ == "__main__":
-    test_generate_batch_shape()
-    test_bid_below_mid_ask_above_mid()
-    test_arrival_times_positive()
-    test_drift_mid_price_changes()
-    test_feeds_into_order_book()
-    print("All tests passed.")
