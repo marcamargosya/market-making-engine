@@ -60,11 +60,3 @@ def test_mid_price():
     assert book.mid_price() == 100.0
 
 
-if __name__ == "__main__":
-    test_add_order_no_match()
-    test_simple_match()
-    test_partial_fill()
-    test_price_time_priority()
-    test_cancel_order()
-    test_mid_price()
-    print("All tests passed.")
