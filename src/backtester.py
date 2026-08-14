@@ -35,13 +35,7 @@ class Backtester:
         self.time_history = []
 
     def _maybe_fill(self, mm_bid, mm_ask, mid_price):
-        """
-        Random-aggressor fill model with spread-dependent fill probability:
-        a wider quote (further from mid) is less likely to get hit, matching
-        the intuition that a rational market taker avoids crossing an
-        unfavorable spread. Fill size is capped so it never pushes inventory
-        past the agent's limit.
-        """
+        """Fill probability decays as spread widens; size capped at inventory limit."""
         if mm_bid is None and mm_ask is None:
             return None
 
